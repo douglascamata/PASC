@@ -1,0 +1,169 @@
+grammar Pasc
+
+  ##################
+  # Program structure
+
+  rule block
+    (comment / statement)+ <Block>
+  end
+
+  rule statement
+    space? ( assignment / if / while / for) ';'? space? linebreak? <Statement>
+  end
+
+  ##################
+  # Literals
+
+  rule integer
+    ('+' / '-')? [0-9]+ <IntegerLiteral>
+  end
+
+  rule float
+    ('+' / '-')? [0-9]+ '.' [0-9]+ <FloatLiteral>
+  end
+
+  rule string
+    '"' ([^"\\] / "\\" . )* '"' <StringLiteral>
+  end
+
+  rule identifier
+    '$'? [a-zA-Z] [a-zA-Z0-9_]* ('?' / '!')? <Identifier>
+  end
+
+  ##################
+  # Assignment
+
+  rule assignment
+    identifier space? assignment_operator space? ( expression ) <Assignment>
+  end
+
+  ##################
+  # Flow control
+
+  rule if
+    'if(' space? comparative space? ')' space
+      block
+    space? 'endif' space? <If>
+  end
+
+  rule while
+    'while(' space? comparative space? ')' space
+      block
+    space? 'endwhile' space? <While>
+  end
+
+  rule for
+    'for(' space? assignment ';' space? comparative ';' space? assignment space? ')'
+      block
+    space? 'endfor' space? <For>
+  end
+
+  ##################
+  # Expressions
+
+  rule expression
+    space? (additive) <Expression>
+  end
+
+  rule comparative
+    primary space? comparative_operator space? primary <ComparativeExpression>
+  end
+
+  rule additive
+    multitive space? additive_operator space? additive <AdditiveExpression>
+    /
+    multitive
+  end
+
+  rule multitive
+    primary space? multitive_operator space? multitive <MultitiveExpression>
+    /
+    primary
+  end
+
+  rule primary
+    identifier / float / integer / string
+    /
+    '(' space? expression space? ')' <Expression>
+  end
+
+  ##################
+  # Operator sets
+
+  rule comparative_operator
+    equality_operator / inequality_operator / greater_than_operator / less_than_operator
+  end
+
+  rule additive_operator
+    addition_operator / subtraction_operator
+  end
+
+  rule multitive_operator
+    multiplication_operator / division_operator
+  end
+
+  ##################
+  # Operators
+
+  rule assignment_operator
+    '=' <AssignmentOperator>
+  end
+
+  rule addition_operator
+    '+' <AdditionOperator>
+  end
+
+  rule subtraction_operator
+    '-' <SubtractionOperator>
+  end
+
+  rule multiplication_operator
+    '*' <MultiplicationOperator>
+  end
+
+  rule division_operator
+    '/' <DivisionOperator>
+  end
+
+  rule equality_operator
+    '==' <EqualityOperator>
+  end
+
+  rule inequality_operator
+    '!=' <InequalityOperator>
+  end
+
+  rule greater_than_operator
+    '>' <GreaterThanOperator>
+  end
+
+  rule less_than_operator
+    '<' <LessThanOperator>
+  end
+
+  ##################
+  # Comments
+
+  rule comment
+    '#' [^"\n"]* ( "\n" / end_of_file )
+  end
+
+  ##################
+  # Whitespace
+
+  rule space
+    [\s]+
+  end
+
+  rule linebreak
+   [\n]+
+  end
+
+  ##################
+  # End of file
+
+  rule end_of_file
+    !.
+  end
+
+end
